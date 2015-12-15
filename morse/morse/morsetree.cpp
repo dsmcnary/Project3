@@ -15,8 +15,8 @@ morsetree::morsetree()
 
 	string line = "";
 	char letter = '\0'; 
-	BTNode < char > root(letter); 
-	BTNode <char> iter(letter); 
+	BTNode <char> root(letter); 
+	BTNode <char> *iter; 
 
 	while (fin >> line)
 	{
@@ -24,37 +24,53 @@ morsetree::morsetree()
 			error("Blank line in morse.txt");
 
 		letter = line[0];
-		
-		for (int i = 1; i < line.length(); i++)
+		line = line.substr(1);
+		iter = &root; 
+		//for (int i = 0; i < line.length(); i++)
+		while (line != "")
 		{
-			if (line[i] == '.')
+			//cout << "i: " << i << "\tline.length(): " << line.length() << endl; 
+			if (line[0] == '.')
 			{
-				if (iter.left == NULL && i == 1 - line.length())
+				if (iter->left != NULL)
+				{
+					iter = iter->left;
+					line = line.substr(1);
+					cout << "Went Left, ";
+				}
+				else
 				{
 					BTNode<char> current(letter);
-					iter.left = &current; 
-				}	
-				else if (iter.left != NULL)
-					iter = *iter.left;
-				else
-					error("Predecessor node not available");
+					iter->left = &current;
+					cout << "added letter: " << letter << ','; 
+					//line = line.substr(1);
+					line = "";
+				}
 			}
 
-			else if (line[i] == '_')
+			else if (line[0] == '_')
 			{
-				if (iter.right == NULL && i == 1 - line.length())
+				if (iter->right != NULL)
+				{
+					iter = iter->right;
+					line = line.substr(1);
+					cout << "Went Right, ";
+				}
+
+				else
 				{
 					BTNode<char> current(letter);
-					iter.right = &current;
+					iter->right = &current;
+					cout << "added letter: " << letter << ',';
+					//line = line.substr(1);
+					line = ""; 
 				}
-				else if (iter.right != NULL)
-					iter = *iter.right;
-				else
-					error("Predecessor node not available");
 			}
 
 			else
 				error("Invalid symbol - must be '.' or '_' ");
+
+			cout << endl; 
 		}
 	}
 }
