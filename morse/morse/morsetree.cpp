@@ -13,12 +13,49 @@ morsetree::morsetree()
 	if (fin.bad())
 		error("File Not Found");
 
-	string letter = ""; 
-	Binary_Tree<std::string> the_tree;
+	string line = "";
+	char letter = '\0'; 
+	BTNode < char > root(letter); 
+	BTNode <char> iter(letter); 
 
-	while (fin >> letter)
+	while (fin >> line)
 	{
+		if (line == "")
+			error("Blank line in morse.txt");
 
+		letter = line[0];
+		
+		for (int i = 1; i < line.length(); i++)
+		{
+			if (line[i] == '.')
+			{
+				if (iter.left == NULL && i == 1 - line.length())
+				{
+					BTNode<char> current(letter);
+					iter.left = &current; 
+				}	
+				else if (iter.left != NULL)
+					iter = *iter.left;
+				else
+					error("Predecessor node not available");
+			}
+
+			else if (line[i] == '_')
+			{
+				if (iter.right == NULL && i == 1 - line.length())
+				{
+					BTNode<char> current(letter);
+					iter.right = &current;
+				}
+				else if (iter.right != NULL)
+					iter = *iter.right;
+				else
+					error("Predecessor node not available");
+			}
+
+			else
+				error("Invalid symbol - must be '.' or '_' ");
+		}
 	}
 }
 
