@@ -1,2 +1,3 @@
 # Project3
-morse
+
+Encodes and Decodes messages based on morse code
