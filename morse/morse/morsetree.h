@@ -23,6 +23,6 @@ public:
 
 private:
 	void error(string s);
-	BTNode<char>* masterRoot; 
-	map<char, string> encodeMap; 
+	BTNode<char>* masterRoot;			// Pointer to Master Root of the morse tree
+	map<char, string> encodeMap;		// Map to store the codes for encrypting a message
 };
