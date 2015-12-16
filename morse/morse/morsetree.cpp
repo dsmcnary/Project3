@@ -1,3 +1,8 @@
+// Daniel McNary
+// Professor Kuhail
+// CS 303
+// 12/16/2015
+
 #include "morsetree.h"
 #include "Binary_Tree.h"
 #include <iostream>
@@ -18,8 +23,9 @@ morsetree::morsetree()
 	string line = "";
 	char letter = '\0';
  
-	BTNode<char> root('\0', NULL, NULL);
-	BTNode<char>* rootPtr = &root;
+	BTNode<char>* rootPtr = new BTNode<char>('\0'); 
+	masterRoot = rootPtr; 
+
 	// Read in one line at a time
 	while (fin >> line)
 	{
@@ -27,42 +33,47 @@ morsetree::morsetree()
 		letter = line[0];
 		cout << letter << endl; 
 		line = line.substr(1);							// remove this letter from rest of line (code)
+		encodeMap.insert(pair<char, string>(letter, line));
 		addNode(line, rootPtr, letter);
 	}
+	cout << pre_order(rootPtr) << endl;
 }
 
 string morsetree::decode(string s)
 {
-	BTNode <char> *iter;
-	string message = ""; 
-
-	while (s != "")
+	string token = "";
+	string message = "";
+	while (s.length() != 0)
 	{
-		iter = masterRoot; 
-		if (s[0] == '.')
+		if (s.find(" ") == string::npos)
 		{
-			//cout << "Going Left " << iter->data << endl;
-			iter = iter->left;
-			s = s.substr(1);
+			token = s;
+			s = "";
 		}
-		else if (s[0] == '_')
+
+		else if (s.find(" ") > 0)
 		{
-			//cout << "Going Right" << iter->data << endl;
-			iter = iter->right;
-			s = s.substr(1);
+			token = s.substr(0, s.find(" "));
+			s = s.substr(s.find(" ") + 1);
 		}
-		else if (s[0] == ' ')
-		{
-			message += iter->data; 
-			s = s.substr(1);
-			//cout << "Data" << iter->data << endl;
-			//cout << "Message: " << message << endl;
-		}
-		else
-			error("Unknown character in decode string");
+
+		message += decodeToken(masterRoot, token);
 	}
 
 	return message; 
+}
+
+char morsetree::decodeToken(BTNode<char>* localRoot, string s)
+{
+	if (s == "")
+	{
+		return localRoot->data; 
+	}
+
+	if (s[0] == '.')
+		return decodeToken(localRoot->left, s.substr(1));
+	else
+		return decodeToken(localRoot->right, s.substr(1));
 }
 
 void morsetree::addNode(string s, BTNode<char>* localRoot, char c)
@@ -108,4 +119,45 @@ void morsetree::error(string s)
 
 morsetree::~morsetree()
 {
+}
+
+string morsetree::pre_order(const BTNode<char>* local_root) const 
+{
+	string result;
+
+	if (local_root != NULL) {
+		result += local_root->to_string();
+
+		if (local_root->left != NULL) {
+			result += " ";
+			result += pre_order(local_root->left);
+		}
+
+		if (local_root->right != NULL) {
+			result += " ";
+			result += pre_order(local_root->right);
+		}
+	}
+	return result;
+}
+
+void morsetree::printMap()
+{
+	map<char, string>::iterator itr;
+
+	for (itr = encodeMap.begin(); itr != encodeMap.end(); itr++)
+		cout << itr->first << '\t' << itr->second << endl; 
+}
+
+string morsetree::encodeMessage(string s)
+{
+	string morse; 
+
+	for (unsigned int i = 0; i < s.length(); i++)
+	{
+		morse += encodeMap.find(s[i])->second;
+		morse += " "; 
+	}
+
+	return morse; 
 }
