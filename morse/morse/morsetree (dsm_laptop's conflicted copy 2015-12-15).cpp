@@ -17,24 +17,85 @@ morsetree::morsetree()
 	// Initialize variables
 	string line = "";
 	char letter = '\0';
- 
-	BTNode<char> root('\0', NULL, NULL);
-	BTNode<char>* rootPtr = &root;
+
 	// Read in one line at a time
 	while (fin >> line)
 	{
 		// First char of each line is the alphabetic letter
 		letter = line[0];
-		cout << letter << endl; 
+		BTNode<char> newnode(letter, NULL, NULL);		// new node based on this letter
 		line = line.substr(1);							// remove this letter from rest of line (code)
-		addNode(line, rootPtr, letter);
+
+		while (line != "")								// Decode until no '.' or '_' remaining
+		{ 
+			if (line[0] == '.')							// Go left if dot
+			{
+				if (iter->left != NULL)
+				{
+					iter = iter->left;
+					line = line.substr(1);
+				}
+				else
+				{
+					iter->left = &newnode;
+					line = "";
+				}
+			}
+
+			else if (line[0] == '_')					// Go right if dash
+			{
+				if (iter->right != NULL)
+				{
+					iter = iter->right;
+					line = line.substr(1);
+				}
+
+				else
+				{
+					iter->right = &newnode;
+					line = ""; 
+				}
+			}
+
+			else
+				error("Invalid symbol - must be '.' or '_' ");
+		}
 	}
+
+	*masterRoot = root; 
+
+	//cout << root.data << endl; 
+	//cout << root.left->data << endl;
+	//cout << root.right->data << endl; 
 }
+
+void morsetree::findNode(string s, Binary_Tree<char> tree, char c)
+{
+	if (s.length() == 1)
+	{
+		BTNode<char> newnode(c, NULL, NULL); 
+		tree.get_left_subtree() = newnode; 
+		return;
+	}
+
+	if (s[0] == '.')
+		findNode(s.substr(1), tree.get_left_subtree(), c);
+	else if (s[0] == '_')
+		findNode(s.substr(1), tree.get_right_subtree(), c);
+	else
+		error("Unknown character in path");
+}
+
+void addNode(char c);
 
 string morsetree::decode(string s)
 {
 	BTNode <char> *iter;
 	string message = ""; 
+
+//	cout << masterRoot->data << endl;
+	//cout << masterRoot->left->data << endl;
+	//cout << masterRoot->right->data << endl;
 
 	while (s != "")
 	{
@@ -63,39 +124,6 @@ string morsetree::decode(string s)
 	}
 
 	return message; 
-}
-
-void morsetree::addNode(string s, BTNode<char>* localRoot, char c)
-{ 
-	//cout << "Working on: " << c << endl; 
-	if (s.length() == 1)
-	{
-		//cout << "1 character in string" << endl; 
-		BTNode<char>* newNode = new BTNode<char>(c);	
-
-		if (s[0] == '.')
-		{
-			localRoot->left = newNode;
-			cout << "New Left Node created: " << localRoot->data << '\t' << localRoot->left->data << endl;
-		}
-		else if (s[0] == '_')
-		{
-			localRoot->right = newNode;
-			cout << "New Right Node created: " << localRoot->data << '\t' << localRoot->right->data << endl;
-		}
-		return; 
-	}
-
-	else
-	{
-		//cout << "Going left/right" << endl; 
-		if (s[0] == '.')
-			return addNode(s.substr(1), localRoot->left, c);
-		else if (s[0] == '_')
-			return addNode(s.substr(1), localRoot->right, c);
-	}
-
-	return;
 }
 
 void morsetree::error(string s)
